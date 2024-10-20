@@ -1,0 +1,153 @@
+ELIMINAZIONE AMBIGUITA'
+⟨prog⟩ ::= ⟨statlist ⟩EOF
+
+⟨statlist ⟩ ::= ⟨stat ⟩⟨statlistp⟩
+
+⟨statlistp⟩ ::= ; ⟨stat ⟩⟨statlistp⟩ | ε
+
+⟨stat ⟩ ::= assign ⟨assignlist ⟩
+| print ( ⟨exprlist ⟩)
+| read ( ⟨idlist ⟩)
+| for( ⟨statq⟩
+| if ( ⟨bexpr ⟩) ⟨stat⟩ ⟨statp⟩
+| {⟨statlist ⟩}
+
+⟨statq⟩::= ID := ⟨expr ⟩; ⟨bexpr ⟩) do ⟨stat ⟩ | ⟨bexpr ⟩) do ⟨stat ⟩
+
+⟨statp ⟩::= else ⟨stat ⟩end | end
+
+⟨assignlist ⟩ ::= [ ⟨expr ⟩to ⟨idlist ⟩] ⟨assignlistp⟩
+
+⟨assignlistp⟩ ::= [ ⟨expr ⟩to ⟨idlist ⟩] ⟨assignlistp⟩ | ε
+
+⟨idlist ⟩ ::= ID ⟨idlistp⟩
+
+⟨idlistp⟩ ::= , ID ⟨idlistp⟩ | ε
+
+⟨bexpr ⟩ ::= RELOP ⟨expr ⟩⟨expr ⟩
+
+⟨expr ⟩ ::= + ( ⟨exprlist ⟩) | - ⟨expr ⟩⟨expr ⟩
+| * ( ⟨exprlist ⟩) | / ⟨expr ⟩⟨expr ⟩
+| NUM | ID
+
+⟨exprlist ⟩ ::= ⟨expr ⟩⟨exprlistp⟩
+
+⟨exprlistp⟩ ::= , ⟨expr ⟩⟨exprlistp⟩ | ε
+______________________________________________
+CALCOLO GUIDE:
+NULL(STATLISTP), NULL(ASSIGNLISTP), NULL(IDLISTP), NULL(EXPRLISTP)
+
+FIRST(PROG)=
+FIRST(STATLIST)=
+FIRST(STAT)={assign,print,read,for,if,{}
+FIRST(STATP)={else,end}
+FIRST(STATQ)={ID,RELOP}
+FIRST(STATLISTP)={;}
+FIRST(ASSIGNLIST)=
+FIRST(ASSIGNLISTP)={[}
+FIRST(IDLIST)={ID}
+FIRST(IDLISTP)={,}
+FIRST(BEXPR)={RELOP}
+FIRST(EXPR)=
+FIRST(EXPRLIST)={+,-,*,/,NUM,ID}
+FIRST(EXPRLISTP)={,}
+
+$ appartiene a FOLLOW(PROG)
+
+{EOF}=FIRST(EOF) ⊆ FOLLOW(STATLIST)
+
+{;}=FIRST(STATLISTP) ⊆ FOLLOW(STAT)
+FOLLOW(STATLIST) ⊆ FOLLOW(STAT)
+FOLLOW(STATLIST) ⊆ FOLLOW(STATLISTP)
+
+FOLLOW(STATLISTP) ⊆ FOLLOW(STAT)
+
+FOLLOW(STAT) ⊆ FOLLOW(ASSIGNLIST)
+{)}=FIRST()) ⊆ FOLLOW(EXPRLIST)
+{)}=FIRST()) ⊆ FOLLOW(IDLIST)
+FOLLOW(STAT) ⊆ FOLLLOW(STATQ)             
+{)}=FIRST()) ⊆ FOLLOW(BEXPR)
+{else,end}=FIRST(STATP) ⊆ FOLLOW(STAT)
+FOLLOW(STAT) ⊆ FOLLOW(STATP)
+{}}=FIRST(}) ⊆ FOLLOW(STATLIST)
+
+{;}=FIRST(;) ⊆ FOLLOW(EXPR)
+FOLLOW(STATQ) ⊆ FOLLOW(STAT)
+
+{end}=FIRST(end) ⊆ FOLLOW(STAT)
+
+{to}=FIRST(to) ⊆ FOLLOW(EXPR)
+{]}=FIRST(]) ⊆ FOLLOW(IDLIST)
+FOLLOW(ASSIGNLIST) ⊆ FOLLOW(ASSIGNLISTP)
+
+FOLLOW(IDLIST) ⊆ FOLLOW(IDLISTP)
+
+{+,-,*,/,NUM,ID}=FIRST(EXPR) ⊆ FOLLOW(EXPR)
+FOLLOW(BEXPR) ⊆ FOLLOW(EXPR)
+
+{,}=FIRST(EXPRLISTP) ⊆ FOLLOW(EXPR)
+FOLLOW(EXPRLIST) ⊆ FOLLOW(EXPR)
+FOLLOW(EXPRLIST) ⊆ FOLLOW(EXPRLISTP)
+FOLLOW(EXPRLISTP) ⊆ FOLLOW(EXPR)
+
+  X             FOLLOW(X)
+PROG               {$}
+STATLIST           {EOF,}}
+STATLISTP          {EOF,}}
+STAT               {;,EOF,else,end,}}
+STATQ              {;,EOF,else,end,}}
+STATP              {;,EOF,else,end,}}
+ASSIGNLIST         {;,EOF,else,end,}}
+ASSIGNLISTP        {;,EOF,else,end,}}
+IDLIST             {),]}
+IDLISTP            {),]}
+BEXPR              {)}
+EXPR               {;,to,+,-,*,/,NUM,ID,),,}
+EXPRLIST           {)}
+EXPRLISTP          {)}
+
+GUIDA(PROG->STATLISTEOF)=FIRST(STATLIST)={assign,print,read,for,if,{}
+
+GUIDA(STATLIST->STATSTATLISTP)=FIRST(STATLISTP)=FIRST(STAT)={assign,print,read,for,if,{}
+
+GUIDA(STATLISTP->;STATSTALISTP)=FIRST(;STATSTALISTP)={;}
+GUIDA(STATLISTP->EPSILON)=FIRST(EPSILON) U FOLLOW(STATLISTP)={EOF,}}
+
+GUIDA(STAT->assignASSIGNLIST)=FIRST(assignASSIGNLIST)={assign}
+GUIDA(STAT->print(EXPRLIST))=FIRST(print(EXPRLIST))={print}
+GUIDA(STAT->read(IDLIST))=FIRST(read(IDLIST))={read}
+GUIDA(STAT->for(STATQ)=FIRST(for)={for}
+GUIDA(STAT->ifBEXPR...)=FIRST(if)={if}
+GUIDA(STAT->{STATLIST})=FIRST({)={{}
+
+GUIDA(STATQ->ID...)..)=FIRST(ID)={ID}
+GUIDA(STATQ->BEXPR)..)=FIRST(BEXPR)={RELOP}
+
+GUIDA(STATP->else..)=FIRST(else)={else}
+GUIDA(STATP->end)={end}
+
+GUIDA(ASSIGNLIST->[....)=FIRST([)={[}
+
+GUIDA(ASSIGNLISTP->[....)=FIRST([)={[}
+GUIDA(ASSIGNLISTP->EPSILON)=FOLLOW(ASSIGNLISTP)={;,EOF,else,end,}}
+
+GUIDA(IDLIST->ID..)={ID}
+
+GUIDA(IDLISTP->,..)={,}
+GUIDA(IDLISTP->EPSILON)=FOLLOW(IDLISTP)={),]}
+
+GUIDA(BEXPR->RELOP..)={RELOP}
+
+GUIDA(EXPR->+....)={+}
+GUIDA(EXPR->-....)={-}
+GUIDA(EXPR->/....)={/}
+GUIDA(EXPR->*....)={*}
+GUIDA(EXPR->NUM)={NUM}
+GUIDA(EXPR->ID)={ID}
+
+GUIDA(EXPRLIST->EXPREXPRLISTP)=FIRST(EXPREXPRLISTP)=FIRST(EXPR)={+,-,*,/,NUM,ID}
+
+GUIDA(EXPRLISTP->,....)=FIRST(,)={,}
+GUIDA(EXPRLISTP->EPSILON)=FOLLOW(EXPRLISTP)={)}
+
+GRAMMATICA LL(1): OK
